@@ -85,7 +85,7 @@ function gb_formatter_default($element) {
 
   if ($result) {
     // output as +44 AA BBBB CCCC, +44 AAA BBB CCCC or +44 AAAA BBB CCC
-    $phone =  $cc['code'] . $matches[1] .'-'. $matches[2] .' '. $matches[3];
+    $phone =  $cc['code'] . $matches[1] . '-' . $matches[2] . ' ' . $matches[3];
   }
 
   return $phone;
@@ -113,7 +113,7 @@ function gb_formatter_local($element) {
 
   if ($result) {
     // output as 0AA BBBB CCCC,  0AAA BBB CCCC or 0AAAA BBB CCC
-    $phone =  '0'. $matches[1] .'-'. $matches[2] .' '. $matches[3];
+    $phone =  '0' . $matches[1] . '-' . $matches[2] . ' ' . $matches[3];
   }
 
   return $phone;

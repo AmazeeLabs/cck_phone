@@ -6,7 +6,7 @@
  */
 
 // Need to include content.crud.test so we can inherit from it's ContentCrudTestCase.
-require_once(drupal_get_path('module', 'content') .'/tests/content.crud.test');
+require_once(drupal_get_path('module', 'content') . '/tests/content.crud.test');
 
 class PhoneNumberContentCrudTest extends ContentCrudTestCase {
 

@@ -135,7 +135,7 @@ function CC_formatter_default($element) {
   $cc = cck_phone_countrycodes($item['country_codes']);
 
   // Format the phone number however you like, this is the default
-  $phone = $cc['code'] .'-'. $item['number'];
+  $phone = $cc['code'] . '-' . $item['number'];
 
   return $phone;
 }

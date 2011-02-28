@@ -67,8 +67,8 @@ function my_validate_number($number, $ext = '', &$error) {
     // define regular expression
     $regex = '/^
       ([0]*)                             # an optional 0
-      ('. $rule[0] .')                   # area code
-      \d{'. $rule[1] .'}                 # local number within length $rule[1] & $rule[2]
+      (' . $rule[0] . ')                   # area code
+      \d{' . $rule[1] . '}                 # local number within length $rule[1] & $rule[2]
       $/x';
 
     $result = preg_match($regex, $number, $matches);
@@ -111,31 +111,29 @@ function my_sanitize_number(&$number) {
  *   TRUE if it is a valid phone number for that country, FALSE otherwise.
  */
 function my_formatter_default($element) {
-  $item = $element['#item'];
-
   // Display a global phone number with country code.
-  $cc = cck_phone_countrycodes($item['country_codes']);
+  $cc = cck_phone_countrycodes($element['country_codes']);
 
   // Format the phone number however you like, this is the default
   foreach (_my_phone_rules() as $rule) {
     // define regular expression
     $regex = '/^
-      ('. $rule[0] .')                   # area code
+      (' . $rule[0] . ')                   # area code
       (\d{3,4})
       (\d{4})
       $/x';
 
-    $result = preg_match($regex, $item['number'], $matches);
+    $result = preg_match($regex, $element['number'], $matches);
 
     if ($result) {
       // output as +60A-BBB CCCC or +60A-BBBB CCCC
-      $phone =  $cc['code'] . $matches[1] .'-'. $matches[2] .' '. $matches[3];
+      $phone =  $cc['code'] . $matches[1] . '-' . $matches[2] . ' ' . $matches[3];
 
       continue;
     }
   }
 
-  return $phone . $ext;
+  return $phone;
 }
 
 /**
@@ -155,12 +153,12 @@ function my_formatter_default($element) {
  */
 function my_formatter_local($element) {
   // Display a local phone number without country code.
-  $phone = $element['#item']['number'];
+  $phone = $element['number'];
 
   foreach (_my_phone_rules() as $rule) {
     // define regular expression
     $regex = '/^
-      ('. $rule[0] .')                   # area code
+      (' . $rule[0] . ')                   # area code
       (\d{3,4})
       (\d{4})
       $/x';
@@ -169,7 +167,7 @@ function my_formatter_local($element) {
 
     if ($result) {
       // output as 0A-BBB CCCC or 0A-BBBB CCCC
-      $phone = '0'. $matches[1] .'-'. $matches[2] .' '. $matches[3];
+      $phone = '0' . $matches[1] . '-' . $matches[2] . ' ' . $matches[3];
       continue;
     }
   }

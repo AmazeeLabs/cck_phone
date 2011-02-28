@@ -556,7 +556,8 @@ function cck_phone_field_widget_form(&$form, &$form_state, $field, $instance, $l
 
   $element += array(
     '#type' => 'phone_number',
-    '#default_value' => isset($items[$delta]) ? $items[$delta] : array(),
+//    '#default_value' => isset($items[$delta]) ? $items[$delta] : array(),
+    '#default_value' => isset($items[$element['#delta']]) ? $items[$element['#delta']] : array(),
     '#process' => array_merge($element_info['#process'], array('cck_phone_field_widget_process')),
     // Allows this field to return an array instead of a single value.
 //    '#extended' => TRUE,

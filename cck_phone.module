@@ -751,15 +751,19 @@ function cck_phone_phone_number_validate(&$element, &$form_state) {
   $instance = field_widget_instance($element, $form_state);
   $settings = $instance['settings'];
 
-  $phone_input = trim($item['number']);
-  $countrycode = trim($item['country_codes']);
+  if (isset($item['number'])) {
+    $phone_input = trim($item['number']);
+  }
+  if (isset($item['country_codes'])) {
+    $countrycode = trim($item['country_codes']);
+  }
   $ext_input = '';
 
-  if ($settings['enable_extension']) {
+  if ($settings['enable_extension'] && isset($item['extension'])) {
     $ext_input = trim($item['extension']);
   }
 
-  if ($phone_input) {
+  if (isset($phone_input)) {
 
     $error_params = array(
       '%phone_input' => check_plain($phone_input),   // original phone input

@@ -709,7 +709,7 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
     '#maxlength' => $field['settings']['size'],
     '#size' => $field['settings']['size'],
 //    '#title' => t('Number'),
-    '#description' => $element['#description'],
+//    '#description' => $element['#description'],
     '#required' => ($element['#delta'] == 0 && $element['#required']) ? $element['#required'] : FALSE,
     '#default_value' => isset($item['number']) ? $item['number'] : NULL,
   );

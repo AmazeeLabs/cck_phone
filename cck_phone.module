@@ -729,7 +729,7 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
   $element['country_codes'] = array(
     '#type' => 'select',
 //    '#title' => 'Country code',
-    '#default_value' => isset($settings['default_country']) ? $settings['default_country'] : NULL,
+    '#default_value' => isset($item['country_codes']) ? $item['country_codes'] : $settings['default_country'],
     '#options' => _cck_phone_cc_options(),
   );
 /*  if ($field['all_country_codes']) {

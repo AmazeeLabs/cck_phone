@@ -35,7 +35,7 @@ function hu_parts($number) {
     // No 9 digit, check for 8 digit
     if (drupal_substr($number, -8) === FALSE) {
       // No 8 digit, too short for valid telephone number
-      $result['error'] = '"%phone_input" is not a valid Hungarian phone number, it should be 9 digits number like "20/123-45-67" or a 8 digit like "23/123-456"';
+      $result['error'] = '"%phone_input" is not a valid Hungarian phone number, it should be a 9 digit number like "20/123-45-67" or a 8 digit number like "23/123-456"';
     }
     else {
       $n = drupal_substr($number, -8);

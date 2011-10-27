@@ -241,9 +241,12 @@ function theme_cck_phone_formatter_global_phone_number($element) {
   // Display a global phone number with country code.
   if (!empty($element['number']) && !empty($element['country_codes'])) {
     // Call country default formatter if exist
-    $function = $element['country_codes'] . '_formatter_default';
-    if (function_exists($function)) {
-      $phone = $function($element);
+    $custom_cc = _cck_phone_custom_cc();
+    if (isset($custom_cc[$element['country_codes']])) {
+      $function = $element['country_codes'] . '_formatter_default';
+      if (function_exists($function)) {
+        $phone = $function($element);
+      }
     }
     else {
       $cc = cck_phone_countrycodes($element['country_codes']);
@@ -268,9 +271,12 @@ function theme_cck_phone_formatter_local_phone_number($element) {
   // Display a local phone number without country code.
   if (!empty($element['number'])) {
     // Call country local formatter if exist
-    $function = $element['country_codes'] . '_formatter_local';
-    if (function_exists($function)) {
-      $phone = $function($element);
+    $custom_cc = _cck_phone_custom_cc();
+    if (isset($custom_cc[$element['country_codes']])) {
+      $function = $element['country_codes'] . '_formatter_local';
+      if (function_exists($function)) {
+        $phone = $function($element);
+      }
     }
     else {
       $phone = $element['number'];

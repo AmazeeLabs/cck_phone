@@ -373,8 +373,12 @@ function _cck_phone_valid_cc_input($list, $cc) {
 }
 
 function _cck_phone_validate(&$item, $delta, $field, $instance, $langcode, &$errors) {
-  $phone_input = trim($item['number']);
-  $countrycode = trim($item['country_codes']);
+  if (isset($item['number'])) {
+    $phone_input = trim($item['number']);
+  }
+  if (isset($item['country_codes'])) {
+    $countrycode = trim($item['country_codes']);
+  }
   $ext_input = '';
   $settings = $instance['settings'];
 
@@ -382,7 +386,7 @@ function _cck_phone_validate(&$item, $delta, $field, $instance, $langcode, &$err
     $ext_input = trim($item['extension']);
   }
 
-  if ($phone_input) {
+  if (isset($phone_input) && !empty($phone_input)) {
 
     $error_params = array(
       '%phone_input' => check_plain($phone_input),   // original phone input
@@ -749,7 +753,7 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
 }
 
 /**
- * An #element_validate callback for the managed_file element.
+ * An #element_validate callback for the phone_number element.
  */
 function cck_phone_phone_number_validate(&$element, &$form_state) {
   $item = $element['#value'];
@@ -769,7 +773,7 @@ function cck_phone_phone_number_validate(&$element, &$form_state) {
     $ext_input = trim($item['extension']);
   }
 
-  if (isset($phone_input)) {
+  if (isset($phone_input) && !empty($phone_input)) {
 
     $error_params = array(
       '%phone_input' => check_plain($phone_input),   // original phone input

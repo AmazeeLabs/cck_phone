@@ -96,8 +96,8 @@ function us_formatter_default($element) {
   $result = preg_match($regex, $element['number'], $matches);
 
   if ($result) {
-    // output as +1 (AAA) BBB CCCC
-    $phone =  $cc['code'] . ' (' . $matches[1] . ') ' . $matches[2] . ' ' . $matches[3];
+    // output as +1 (AAA) BBB-CCCC
+    $phone =  $cc['code'] . ' (' . $matches[1] . ') ' . $matches[2] . '-' . $matches[3];
   }
 
   return $phone;
@@ -132,7 +132,7 @@ function us_formatter_local($element) {
 
   if ($result) {
     // output as (AAA) BBB CCCC
-    $phone =  '(' . $matches[1] . ') ' . $matches[2] . ' ' . $matches[3];
+    $phone =  '(' . $matches[1] . ') ' . $matches[2] . '-' . $matches[3];
   }
 
   return $phone;

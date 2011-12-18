@@ -601,10 +601,9 @@ function cck_phone_field_widget_process($element, &$form_state, $form) {
      '#type' => 'textfield',
      '#maxlength' => CCK_PHONE_EXTENSION_MAX_LENGTH,
      '#size' => CCK_PHONE_EXTENSION_MAX_LENGTH,
-//     '#title' => t('ext'),
+     '#title' => t('ext'),
      '#required' => FALSE,
      '#default_value' => isset($item['extension']) ? $item['extension'] : NULL,
-     '#prefix' => '<div class="cck-phone-extension">' . t('ext') . '</div>',
     );
   }
 
@@ -722,6 +721,11 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
 //    '#description' => $element['#description'],
     '#required' => ($element['#delta'] == 0 && $element['#required']) ? $element['#required'] : FALSE,
     '#default_value' => isset($item['number']) ? $item['number'] : NULL,
+    '#attached' => array(
+      'css' => array(
+        drupal_get_path('module', 'cck_phone') . '/cck_phone.css',
+      )
+    )
   );
 
 /*  if ($field['enable_extension']) {

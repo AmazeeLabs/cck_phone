@@ -58,6 +58,7 @@ function cck_phone_field_info() {
         'default_country' => NULL,
         'all_country_codes' => TRUE,
         'country_codes' => array('hide_single_cc' => FALSE, 'country_selection' => array()),
+        'country_code_position' => 'after',
         'enable_country_level_validation' => TRUE,
         'enable_extension' => FALSE,
       ),
@@ -114,6 +115,17 @@ function cck_phone_field_instance_settings_form($field, $instance) {
     '#default_value' => isset($settings['country_codes']['country_selection']) && !empty($settings['country_codes']['country_selection']) ? $settings['country_codes']['country_selection'] : array($settings['default_country'] => $settings['default_country']),
     '#options' => _cck_phone_cc_options(TRUE),
     '#description' => t('Country marks with <em>*</em> has custom country code settings and/or validation.'),
+  );
+
+  $form['country_code_position'] = array(
+    '#type' => 'radios',
+    '#title' => t('Country code position'),
+    '#options' => array(
+      'before' => t('Before phone number'),
+      'after' => t('After phone number'),
+    ),
+    '#default_value' => $settings['country_code_position'],
+    '#description' => t('Select the position of the country code selection field relative to the phone number text field.'),
   );
 
   $form['enable_country_level_validation'] = array(
@@ -611,6 +623,7 @@ function cck_phone_field_widget_process($element, &$form_state, $form) {
      '#title' => t('ext'),
      '#required' => FALSE,
      '#default_value' => isset($item['extension']) ? $item['extension'] : NULL,
+     '#weight' => 2,
     );
   }
 
@@ -732,7 +745,8 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
       'css' => array(
         drupal_get_path('module', 'cck_phone') . '/cck_phone.css',
       )
-    )
+    ),
+    '#weight' => 0,
   );
 
 /*  if ($field['enable_extension']) {
@@ -764,6 +778,7 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
           $element['country_codes'] = array(
             '#type' => 'item',
             '#markup' => $value = $cc['country'] . ' (' . $cc['code'] . ')',
+            '#weight' => ($settings['country_code_position'] == 'after' ? 1 : -1),
           );
         }
       }
@@ -775,6 +790,7 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
   //    '#title' => 'Country code',
       '#default_value' => isset($item['country_codes']) ? $item['country_codes'] : $settings['default_country'],
       '#options' => _cck_phone_cc_options(),
+      '#weight' => ($settings['country_code_position'] == 'after' ? 1 : -1),
     );
   }
 

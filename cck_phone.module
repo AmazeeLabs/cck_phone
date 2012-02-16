@@ -292,7 +292,9 @@ function theme_cck_phone_formatter_global_phone_number($element) {
         $phone = $function($element);
       }
     }
-    else {
+
+    // Output a raw value if no custom formatter or formatter return empty
+    if (empty($phone)) {
       $cc = cck_phone_countrycodes($element['country_codes']);
       $phone = $cc['code'] . '-' . $element['number'];
     }
@@ -322,7 +324,9 @@ function theme_cck_phone_formatter_local_phone_number($element) {
         $phone = $function($element);
       }
     }
-    else {
+
+    // Output a raw value if no custom formatter or formatter return empty
+    if (empty($phone)) {
       $phone = $element['number'];
     }
 

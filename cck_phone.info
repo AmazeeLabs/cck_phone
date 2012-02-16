@@ -6,6 +6,7 @@ core = 7.x
 
 files[] = cck_phone.module
 files[] = includes/cck_phone_countrycodes.inc
+files[] = includes/cck_phone.token.inc
 files[] = includes/phone.au.inc
 files[] = includes/phone.ca.inc
 files[] = includes/phone.gb.inc

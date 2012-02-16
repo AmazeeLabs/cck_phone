@@ -211,23 +211,6 @@ function cck_phone_field_presave($entity_type, $entity, $field, $instance, $lang
 }
 
 /**
- * Implements hook_field_load().
- *
- * Where possible, generate the sanitized version of each field early so that
- * it is cached in the field cache. This avoids looking up from the filter cache
- * separately.
- *
- * @see cck_phone_field_formatter_view()
- */
-/*function cck_phone_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
-  foreach ($entities as $id => $entity) {
-    foreach ($items[$id] as $delta => $item) {
-      _cck_phone_sanitize($items[$id][$delta], $instances[$id], $langcode);
-    }
-  }
-}*/
-
-/**
  * Implements hook_field_formatter_info().
  */
 function cck_phone_field_formatter_info() {
@@ -614,13 +597,9 @@ function cck_phone_field_widget_form(&$form, &$form_state, $field, $instance, $l
 
   $element += array(
     '#type' => 'phone_number',
-//    '#default_value' => isset($items[$delta]) ? $items[$delta] : array(),
     '#default_value' => isset($items[$element['#delta']]) ? $items[$element['#delta']] : array(),
     '#process' => array_merge($element_info['#process'], array('cck_phone_field_widget_process')),
-    // Allows this field to return an array instead of a single value.
-//    '#extended' => TRUE,
   );
-//  $elements = array($element);
 
   return $element;
 }
@@ -687,75 +666,9 @@ function cck_phone_element_info() {
 }
 
 /**
- * FAPI theme for an individual phone number elements.
- *
- * The phone number is already rendered by the themes and the html
- * output lives in $element['#children']. Override this theme to
- * make custom changes to the output.
- *
- * $element['#title'] is the field title
- * $element['#field_name'] contains the field name
- * $element['#delta''] is the position of this element in the group
- * $element['number] is the phone number
- * $element['country_codes'] is the country code
- */
-/*function theme_phone_number($element) {
-  drupal_add_css(drupal_get_path('module', 'cck_phone') . '/cck_phone.css');
-
-  // Prefix single value phone number fields with the name of the field.
-//  if (empty($element['#field']['multiple'])) {
-//    if (isset($element['number']) && isset($element['country_codes'])) {
-//      $element['number']['#title'] = $element['#title'] . ' ' . $element['number']['#title'];
-//      $element['country_codes']['#title'] = $element['#title'] . ' ' . $element['country_codes']['#title'];
-//    }
-//    elseif ($element['number']) {
-//      $element['number']['#title'] = $element['#title'];
-//    }
-//  }
-
-  $output = '';
-
-  $output = '<div class="form-item"';
-  if (!empty($element['#id'])) {
-    $output .= ' id="' . $element['#id'] . '-wrapper"';
-  }
-  $output .= ">\n";
-
-  $required = !empty($element['#required']) ? '<span class="form-required" title="' . t('This field is required.') . '">*</span>' : '';
-
-  if (!empty($element['#title'])) {
-    $title = $element['#title'];
-    if (!empty($element['number']['#id'])) {
-      $output .= ' <label for="' . $element['number']['#id'] . '">' . t('!title: !required', array('!title' => filter_xss_admin($title), '!required' => $required)) . "</label>\n";
-    }
-    else {
-      $output .= ' <label>' . t('!title: !required', array('!title' => filter_xss_admin($title), '!required' => $required)) . "</label>\n";
-    }
-  }
-
-  $output .= '<div class="cck-phone-field clear-block">';
-  if (isset($element['number'])) {
-    $output .= '<div class="cck-phone-field-phone cck-phone-column">' . theme('textfield', $element['number']) . '</div>';
-  }
-  if (isset($element['extension'])) {
-    $prefix = isset($element['extension']['#prefix']) ? $element['extension']['#prefix'] : '';
-    $output .= '<div class="cck-phone-field-ext cck-phone-column">' . $prefix . theme('textfield', $element['extension']) . '</div>';
-  }
-  $output .= '<div class="cck-phone-field-cc cck-phone-column">' . theme('select', $element['country_codes']) . '</div>';
-  $output .= '</div></div>';
-
-  return $output;
-}
-*/
-
-/**
  * Process an individual element.
  */
 function cck_phone_phone_number_process($element, &$form_state, $form) {
-//  $field_name = $element['#field_name'];
-//  $field = $form['#field_info'][$field_name];
-//  $field_key  = $element['#columns'][0];
-//  $delta = $element['#delta'];
   $item = $element['#value'];
 
   $field = field_widget_field($element, $form_state);
@@ -767,7 +680,6 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
     '#maxlength' => $field['settings']['size'],
     '#size' => $field['settings']['size'],
 //    '#title' => t('Number'),
-//    '#description' => $element['#description'],
     '#required' => ($element['#delta'] == 0 && $element['#required']) ? $element['#required'] : FALSE,
     '#default_value' => isset($item['number']) ? $item['number'] : NULL,
     '#attached' => array(
@@ -777,19 +689,6 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
     ),
     '#weight' => 0,
   );
-
-/*  if ($field['enable_extension']) {
-    $element['extension'] = array(
-     '#type' => 'textfield',
-     '#maxlength' => CCK_PHONE_EXTENSION_MAX_LENGTH,
-     '#size' => CCK_PHONE_EXTENSION_MAX_LENGTH,
-//     '#title' => t('ext'),
-     '#required' => FALSE,
-     '#default_value' => isset($element['#value']['extension']) ? $element['#value']['extension'] : NULL,
-     '#prefix' => '<div class="cck-phone-extension">' . t('ext') . '</div>',
-    );
-  }
-*/
 
   // If only one country code, make it as hidden form item
   $country_list = array_count_values($settings['country_codes']['country_selection']);
@@ -832,13 +731,6 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
     $element['country_codes']['#default_value'] = $settings['default_country'];
   }
 
-/*  if ($field['all_country_codes']) {
-    $element['country_codes']['#options'] = _cck_phone_cc_options();
-  }
-  else {
-    $element['country_codes']['#options'] = _cck_phone_cc_options(FALSE, $field['country_selection']);
-  }
-*/
   return $element;
 }
 

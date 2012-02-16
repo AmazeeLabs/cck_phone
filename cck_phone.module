@@ -412,7 +412,7 @@ function _cck_phone_validate(&$item, $delta, $field, $instance, $langcode, &$err
   }
   $ext_input = '';
   $settings = $instance['settings'];
-
+dsm($item);
   if ($settings['enable_extension']) {
     $ext_input = trim($item['extension']);
   }
@@ -696,14 +696,12 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
     foreach (array_keys($country_list) as $k => $v) {
       if ($v != '0') {  // only one value other than '0'
         $cc = cck_phone_countrycodes($v);
-        if ($settings['country_codes']['hide_single_cc']) {
-          $element['country_codes'] = array(
-            '#type' => 'hidden',
-            '#value' => $v,
-          );
-        }
-        else {
-          $element['country_codes'] = array(
+        $element['country_codes'] = array(
+          '#type' => 'hidden',
+          '#value' => $v,
+        );
+        if (!$settings['country_codes']['hide_single_cc']) {
+          $element['country_codes_markup'] = array(
             '#type' => 'item',
             '#markup' => $value = $cc['country'] . ' (' . $cc['code'] . ')',
             '#weight' => ($settings['country_code_position'] == 'after' ? 1 : -1),

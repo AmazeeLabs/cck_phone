@@ -65,8 +65,9 @@
           .removeClass('cck-phone-default-country')
           .find('span.default-cc').remove();
 
+        // TODO: check for "Enable default country code" only set the checkbox
         $(this)
-          .attr('checked', 'checked')
+          // .attr('checked', 'checked')
           .parents('.form-item:first')
             .addClass('cck-phone-default-country')
             .append(span);

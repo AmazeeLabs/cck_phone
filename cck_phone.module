@@ -55,6 +55,7 @@ function cck_phone_field_info() {
       'description' => t('Store a number and country code in the database to assemble a phone number.'),
       'settings' => array('size' => CCK_PHONE_PHONE_MAX_LENGTH),
       'instance_settings' => array(
+        'enable_default_country' => TRUE,
         'default_country' => NULL,
         'all_country_codes' => TRUE,
         'country_codes' => array('hide_single_cc' => FALSE, 'country_selection' => array()),
@@ -79,11 +80,24 @@ function cck_phone_field_instance_settings_form($field, $instance) {
   $settings   = array_merge($defaults, $instance['settings']);
 
   $form = array();
+  $form['enable_default_country'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable default country code'),
+    '#default_value' => $settings['enable_default_country'],
+    '#description' => t('Check this to enable default country code below.'),
+  );
+
   $form['default_country'] = array(
     '#type' => 'select',
     '#title' => t('Default country code'),
     '#default_value' => $settings['default_country'],
     '#options' => _cck_phone_cc_options(TRUE),
+    '#description' => t('Item marked with * comes with country level phone number validation.'),
+    '#states' => array(
+      'invisible' => array(
+        ':input[name="instance[settings][enable_default_country]"]' => array('checked' => FALSE),
+      ),
+    ),
   );
 
   $form['all_country_codes'] = array(
@@ -92,14 +106,18 @@ function cck_phone_field_instance_settings_form($field, $instance) {
     '#default_value' => $settings['all_country_codes'],
     '#description' => t('Uncheck this to select the country to be displayed.'),
   );
-
   // Country codes settings
   $form['country_codes'] = array(
     '#title' => 'Country selection',
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    '#collapsed' => FALSE,
     '#attributes' => array('class' => array('cck-phone-settings')),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="instance[settings][all_country_codes]"]' => array('checked' => FALSE),
+      ),
+    ),
   );
 
   $form['country_codes']['hide_single_cc'] = array(
@@ -116,6 +134,13 @@ function cck_phone_field_instance_settings_form($field, $instance) {
     '#options' => _cck_phone_cc_options(TRUE),
     '#description' => t('Country marks with <em>*</em> has custom country code settings and/or validation.'),
   );
+
+  if (isset($settings['country_codes']['country_selection']) && !empty($settings['country_codes']['country_selection'])) {
+    $form['country_codes']['country_selection']['#default_value'] = $settings['country_codes']['country_selection'];
+  }
+  elseif ($settings['enable_default_country']) {
+    $form['country_codes']['country_selection']['#default_value'] = array($settings['default_country'] => $settings['default_country']);
+  }
 
   $form['country_code_position'] = array(
     '#type' => 'radios',
@@ -788,10 +813,19 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
     $element['country_codes'] = array(
       '#type' => 'select',
   //    '#title' => 'Country code',
-      '#default_value' => isset($item['country_codes']) ? $item['country_codes'] : $settings['default_country'],
       '#options' => _cck_phone_cc_options(),
       '#weight' => ($settings['country_code_position'] == 'after' ? 1 : -1),
     );
+  }
+
+  if (!$element['#required']) {
+    $element['country_codes']['#empty_option'] = t('- Select -');
+  }
+  if (isset($item['country_codes'])) {
+    $element['country_codes']['#default_value'] = $item['country_codes'];
+  }
+  elseif ($settings['enable_default_country']) {
+    $element['country_codes']['#default_value'] = $settings['default_country'];
   }
 
 /*  if ($field['all_country_codes']) {
@@ -826,34 +860,21 @@ function cck_phone_phone_number_validate(&$element, &$form_state) {
   }
 
   if (isset($phone_input) && !empty($phone_input)) {
-
-    $error_params = array(
-      '%phone_input' => check_plain($phone_input),   // original phone input
-      '%countrycode' => check_plain($countrycode),
-      '%min_length' => CCK_PHONE_PHONE_MIN_LENGTH,
-      '%max_length' => CCK_PHONE_PHONE_MAX_LENGTH,
-      '%ext_input' => check_plain($ext_input),
-      '%ext_max_length' => CCK_PHONE_EXTENSION_MAX_LENGTH,
-    );
-
-    // Only allow digit, dash, space and bracket
-    if (!_cck_phone_valid_input($phone_input, $ext_input)) {
-      $error = t('The phone number must be between %min_length and %max_length digits in length.', $error_params);
-      if ($settings['enable_extension'] && $ext_input != '') {
-        $error .= '<br />' . t('The phone extension must be less than %ext_max_length digits in length.', $error_params);
-      }
-
-      form_set_error($field['field_name'], $error);
+    if (empty($countrycode)) {
+      form_set_error($field['field_name'], t('The phone number must be accompanied by a country code.'));
     }
     else {
-      if (!$settings['all_country_codes']) {
-        if (!_cck_phone_valid_cc_input($settings['country_codes']['country_selection'], $countrycode)) {
-          $error = t('Invalid country code "%countrycode" submitted.', $error_params);
-          form_set_error($field['field_name'], $error);
-        }
-      }
-      // Generic number validation
-      if (!cck_phone_validate_number($countrycode, $phone_input, $ext_input)) {
+      $error_params = array(
+        '%phone_input' => check_plain($phone_input),   // original phone input
+        '%countrycode' => check_plain($countrycode),
+        '%min_length' => CCK_PHONE_PHONE_MIN_LENGTH,
+        '%max_length' => CCK_PHONE_PHONE_MAX_LENGTH,
+        '%ext_input' => check_plain($ext_input),
+        '%ext_max_length' => CCK_PHONE_EXTENSION_MAX_LENGTH,
+      );
+
+      // Only allow digit, dash, space and bracket
+      if (!_cck_phone_valid_input($phone_input, $ext_input)) {
         $error = t('The phone number must be between %min_length and %max_length digits in length.', $error_params);
         if ($settings['enable_extension'] && $ext_input != '') {
           $error .= '<br />' . t('The phone extension must be less than %ext_max_length digits in length.', $error_params);
@@ -861,17 +882,34 @@ function cck_phone_phone_number_validate(&$element, &$form_state) {
 
         form_set_error($field['field_name'], $error);
       }
-      // Country level validation if enabled
-      elseif ($settings['enable_country_level_validation']) {
-        $custom_cc = _cck_phone_custom_cc();
+      else {
+        if (!$settings['all_country_codes']) {
+          if (!_cck_phone_valid_cc_input($settings['country_codes']['country_selection'], $countrycode)) {
+            $error = t('Invalid country code "%countrycode" submitted.', $error_params);
+            form_set_error($field['field_name'], $error);
+          }
+        }
+        // Generic number validation
+        if (!cck_phone_validate_number($countrycode, $phone_input, $ext_input)) {
+          $error = t('The phone number must be between %min_length and %max_length digits in length.', $error_params);
+          if ($settings['enable_extension'] && $ext_input != '') {
+            $error .= '<br />' . t('The phone extension must be less than %ext_max_length digits in length.', $error_params);
+          }
 
-        if (isset($custom_cc[$countrycode])) {
-          $validate_function = $countrycode . '_validate_number';
+          form_set_error($field['field_name'], $error);
+        }
+        // Country level validation if enabled
+        elseif ($settings['enable_country_level_validation']) {
+          $custom_cc = _cck_phone_custom_cc();
 
-          if (function_exists($validate_function)) {
-            $error = '';
-            if (!$validate_function($phone_input, $ext_input, $error)) {
-              form_set_error($field['field_name'], t($error, $error_params));
+          if (isset($custom_cc[$countrycode])) {
+            $validate_function = $countrycode . '_validate_number';
+
+            if (function_exists($validate_function)) {
+              $error = '';
+              if (!$validate_function($phone_input, $ext_input, $error)) {
+                form_set_error($field['field_name'], t($error, $error_params));
+              }
             }
           }
         }

@@ -866,3 +866,4 @@ function cck_phone_validate_number($countrycode, $number, $ext = '') {
 
   return TRUE;
 }
+

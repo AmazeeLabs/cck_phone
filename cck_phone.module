@@ -36,6 +36,9 @@ function cck_phone_theme() {
     'phone_number_extension' => array(
       'render element' => 'element',
     ),
+    'phone_number_comment' => array(
+      'render element' => 'element',
+    ),
     'cck_phone_formatter_global_phone_number' => array(
       'variables' => array('element' => NULL),
     ),
@@ -62,6 +65,7 @@ function cck_phone_field_info() {
         'country_code_position' => 'after',
         'enable_country_level_validation' => TRUE,
         'enable_extension' => FALSE,
+        'enable_comment' => FALSE,
       ),
       'default_widget' => 'phone_number',
       'default_formatter' => 'global_phone_number',
@@ -167,6 +171,13 @@ function cck_phone_field_instance_settings_form($field, $instance) {
     '#description' => t('Check this to enable phone number extension field.'),
   );
 
+  $form['enable_comment'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable phone comment support'),
+    '#default_value' => $settings['enable_comment'],
+    '#description' => t('Check this to enable phone number comment field.'),
+  );
+
   // Display country specific settings
   foreach (_cck_phone_custom_cc() as $cc) {
     $function = $cc . '_phone_field_settings';
@@ -260,6 +271,13 @@ function theme_phone_number_extension($element = '') {
 }
 
 /**
+ * Theme function for phone comment.
+ */
+function theme_phone_number_comment($element = '') {
+  return t('<br/ >Comment: %comment', array('%comment' => $element['element']));
+}
+
+/**
  * Theme function for 'default' or global phone number field formatter.
  */
 function theme_cck_phone_formatter_global_phone_number($element) {
@@ -285,6 +303,11 @@ function theme_cck_phone_formatter_global_phone_number($element) {
     // Extension
     if (!empty($element['extension'])) {
       $phone = $phone . theme('phone_number_extension', $element['extension']);
+    }
+
+    // Comment
+    if (!empty($element['comment'])) {
+      $phone .= theme('phone_number_comment', $element['comment']);
     }
   }
 
@@ -313,9 +336,9 @@ function theme_cck_phone_formatter_local_phone_number($element) {
       $phone = $element['number'];
     }
 
-    // Extension
-    if (!empty($element['extension'])) {
-      $phone = $phone . theme('phone_number_extension', $element['extension']);
+    // Comment
+    if (!empty($element['comment'])) {
+      $phone .= theme('phone_number_comment', $element['comment']);
     }
   }
 
@@ -632,6 +655,17 @@ function cck_phone_field_widget_process($element, &$form_state, $form) {
      '#required' => FALSE,
      '#default_value' => isset($item['extension']) ? $item['extension'] : NULL,
      '#weight' => 2,
+    );
+  }
+  if ($settings['enable_comment']) {
+    $element['comment'] = array(
+      '#type' => 'textfield',
+      '#maxlength' => 255,
+      '#size' => 15,
+      '#title' => t('Comment'),
+      '#required' => FALSE,
+      '#default_value' => isset($item['comment']) ? $item['comment'] : NULL,
+      '#weight' => 3,
     );
   }
 

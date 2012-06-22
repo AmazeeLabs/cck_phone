@@ -27,6 +27,11 @@ function cck_phone_field_schema($field) {
         'length' => 6,
         'not null' => FALSE,
       ),
+      'comment' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
     ),
   );
 }

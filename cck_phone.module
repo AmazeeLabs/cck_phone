@@ -493,6 +493,12 @@ function _cck_phone_validate(&$item, $delta, $field, $instance, $langcode, &$err
       }
     }
   }
+  elseif ($instance['required']) {
+    $errors[$field['field_name']][$langcode][$delta][] = array(
+      'error' => 'number',
+      'message' => t('%name field is required.', array('%name' => $instance['label'])),
+    );
+  }
 }
 
 function _cck_phone_process(&$item, $delta = 0, $field, $instance, $langcode) {

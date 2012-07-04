@@ -274,7 +274,10 @@ function theme_phone_number_extension($element = '') {
  * Theme function for phone comment.
  */
 function theme_phone_number_comment($element = '') {
-  return t('<br/ >Comment: %comment', array('%comment' => $element['element']));
+  $output = '<div class="cck-phone-comment">';
+  $output .= t('Comment: %comment', array('%comment' => $element['element']));
+  $output .= '</div>';
+  return $output;
 }
 
 /**

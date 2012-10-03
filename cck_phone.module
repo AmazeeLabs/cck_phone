@@ -721,7 +721,7 @@ function cck_phone_phone_number_process($element, &$form_state, $form) {
 
   // If only one country code, make it as hidden form item
   $country_list = array_count_values($settings['country_codes']['country_selection']);
-  if ($country_list['0'] == count($settings['country_codes']['country_selection']) - 1) {
+  if (isset($country_list['0']) && $country_list['0'] == count($settings['country_codes']['country_selection']) - 1) {
     foreach (array_keys($country_list) as $k => $v) {
       if ($v != '0') {  // only one value other than '0'
         $cc = cck_phone_countrycodes($v);

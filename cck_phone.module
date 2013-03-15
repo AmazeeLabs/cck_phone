@@ -486,7 +486,10 @@ function _cck_phone_validate(&$item, $delta, $field, $instance, $langcode, &$err
   elseif ($instance['required']) {
     $errors[$field['field_name']][$langcode][$delta][] = array(
       'error' => 'number',
-      'message' => t('%name field is required.', array('%name' => $instance['label'])),
+      'message' => t('%name field is required.', array(
+        '%name' => module_exists('i18n_field')
+            ? i18n_field_translate_property($instance, 'label') : $instance['label'],
+      )),
     );
   }
 }
